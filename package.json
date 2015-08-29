@@ -1,0 +1,39 @@
+{
+  "name": "node-gfs",
+  "version": "0.1.1",
+  "author": "yejianfei.billy",
+  "description": "使用nodejs 实现了基于mongodb GridFS的文件上传与下载的后台服务。",
+  "keywords": [
+    "node.js",
+    "mongodb",
+    "GridFS"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://path/to/url"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "0.12.x"
+  },
+  "bugs": {
+    "url": "http://path/to/bug",
+    "email": "yejianfei.billy@gmail.com"
+  },
+  "maintainers": [
+    "yejianfei <yejianfei.billy@gmail.com>"
+  ],
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "formidable": "latest",
+    "fs-extra": "~0.23.1",
+    "mongodb": "~2.0.42",
+    "redis": "~0.12.1",
+    "redis-connection-pool": "~1.1.0",
+    "sharp": "~0.11.2"
+  },
+  "main": "app.js",
+  "devDependencies": {}
+}
