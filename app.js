@@ -1,5 +1,5 @@
 
-// Copyright 2015 yejianfei.billy. All rights reserved.
+// Copyright 2015 yejianfei. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
