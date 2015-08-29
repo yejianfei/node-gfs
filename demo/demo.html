@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="//cdn.bootcss.com/jquery/2.1.4/jquery.js"></script>
+		<script src="/fbrowser.js"></script>
+		<script type="text/javascript">
+		$(document).ready(function(){
+			var url = '/images';
+
+			$('#test').fbrowser({
+				'url':url,
+				'callback':function(data){
+					$('#preview').css('background-image','url("' + url + '/' + data.file_name + '")');
+
+					$('#result').html(JSON.stringify(data,null,4));
+				}
+			});
+
+			$('#commit').click(function() {
+				$(this).fcommit({
+					'success':function(data, textStatus, jqXHR){
+						$('#result').html(JSON.stringify(data,null,4));
+					}
+				});
+			});
+
+		});
+
+		</script>
+
+	</head>
+	<body>
+		<div id="preview" style="width:640px;height:480px;background:#ff0000;"></div>
+		<div style="margin:10px;">
+				<span id="test">上传</span>
+				<span id="commit">提交</span>
+		</div>
+		<div id="result"></div>
+	</body>
+</html>
