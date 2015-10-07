@@ -5,11 +5,11 @@
 		options = options || {};
 
 		return this.each(function () {
-			var $this;
-
-			var ele = $('span.hide-value',$this);
+			var ele = $('span.hide-value',this);
+		
 			if(ele.length != 0 && ele.text() != '') {
 				$.ajax(ele.text(),{
+					'type' : 'PUT',
 					'method' : 'PUT',
 					'success' : function(data, textStatus, jqXHR){
 						ele.text("");

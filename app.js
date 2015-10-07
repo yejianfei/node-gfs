@@ -14,11 +14,11 @@ var settings = require('./config.js').settings,
 	path = require('path'),
 	sharp = require('sharp'),
 	formidable = require('formidable'),
-	redis = require('redis-connection-pool')('redis',settings.redis.options),
-	sub = require('redis').createClient('6379', '127.0.0.1'),
+	redis = require('redis-connection-pool')('redis',settings.redis),
+	sub = require('redis').createClient(settings.redis.port, settings.redis.host,settings.redis.options),
 	mongo = require('mongodb'),
 	mongoserver = new mongo.Server(settings.mongo.host, settings.mongo.port, settings.mongo.options),
-	db = new mongo.Db('test', mongoserver, {})
+	db = new mongo.Db(settings.mongo.db, mongoserver, {})
 
 
 /**
@@ -178,11 +178,15 @@ function doGet(req, resp) {
 
 	var store = new mongo.GridStore(db,name,"r",{'root':getBucket(req)});
 
+	if(name == null || name == ''){
+		endWithNotFound(resp);
+		return;
+	}
+
 	store.open(function(err, gfs) {
 	
 		//读取mongodb文件失败，尝试在临时目录中查找文件。
 		if(err){
-
 			if(!fs.existsSync(file_path)){
 				//临时文件同样查找文件失败，返回404
 				endWithNotFound(resp);
@@ -362,6 +366,7 @@ function doPost(req, resp) {
 						'<html>',
 							'<head>',
 								'<script type="text/javascript">',
+									'document.domain = "' + settings.domain + '";',
 									'window.data = ' + JSON.stringify(data) + ';',
 								'</script>',
 							'</head>',
@@ -369,40 +374,40 @@ function doPost(req, resp) {
 					].join(''));
 
 					resp.end();
-			 	}
+			 	} else { //使用httpclient方式上传，返回JSON结果。
+					resp.writeHead(200, {'content-type': 'application/json;charset=UTF-8'});
+					resp.end(JSON.stringify(data));
+				}
 
 			});
     	} else { //没有上传任何文件返回 406
 
-        	resp.writeHead(406, {'Content-Type': 'text/plain'});
-            resp.end();
+        		resp.writeHead(406, {'Content-Type': 'text/plain'});
+        		resp.end();
     	}
 
     });
 
 }
 //创建HTTP服务对象。
-var server = http.createServer(function(req, resp) {
+var server = http.createServer(function(req, resp){
 
 	//处理实例页面及客户端脚本请求，直接返回对应的静态文件。
 	if('/demo.html' == req.url || '/fbrowser.js' == req.url) {
 
 		fs.readFile('./demo/' + url.parse(req.url).pathname, 'binary', function(err, file) {
 			
-            if (err) {
-            	//读取文件错误返回，HTTP 500
-                resp.writeHead(500, {'Content-Type': 'text/plain'});
-                resp.end();
-
-            } else {
-            	//读取成功返回文件内容。
-            	resp.writeHead(200, {'Content-Type': 'text/html'});
+			if(err) {
+				//读取文件错误返回，HTTP 500
+				resp.writeHead(500, {'Content-Type': 'text/plain'});
+				resp.end();
+			} else {
+				//读取成功返回文件内容。
+				resp.writeHead(200, {'Content-Type': 'text/html'});
 				resp.write(file, 'binary');
 				resp.end();
-            }
-
-         });
-
+			}
+		});
 	} else {
 
 		//如果请求的文件集合，不存在与配置文件中所允许的（settings.allowBuckets），返回HTTP 400
@@ -456,7 +461,6 @@ sub.psubscribe('__keyevent@0__:*');
 db.open(function(err, db) {
 	server.listen(3000);
 });
-
 
 
 
